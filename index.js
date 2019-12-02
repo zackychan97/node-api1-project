@@ -97,3 +97,32 @@ server.delete('/users/:id', (req, res) => {
             res.status(500).json({ errorMessage: 'error removing the user' })
         })
 })
+
+
+// PUT REQUESTS BELOW
+// 1.
+
+server.put('users/:id', (req, res) => {
+    const id = req.params.id;
+    const dbUserInfo = req.body;
+
+    db.update(id)
+        .then(found => {
+            if (found) {
+                res.status(200).json(dbUserInfo)
+            } else if (dbInfo !== 'name' && 'bio') {
+                res.end()
+                .status(400)
+                .json({ errorMessage: 'Name and bio required' })
+            } else {
+                res.status(404).json({ message: 'User id does not exist' })
+            }
+        })
+        .catch(error => {
+            console.log('error on PUT to /users/:id', error)
+            res
+                .end()
+                .status(500)
+                .json({ error: 'The user info couldnt be changed' })
+        });
+})
