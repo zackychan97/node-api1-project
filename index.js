@@ -106,23 +106,23 @@ server.put('users/:id', (req, res) => {
     const id = req.params.id;
     const dbUserInfo = req.body;
 
-    db.update(id)
-        .then(found => {
-            if (found) {
-                res.status(200).json(dbUserInfo)
-            } else if (dbInfo !== 'name' && 'bio') {
-                res.end()
-                .status(400)
-                .json({ errorMessage: 'Name and bio required' })
-            } else {
-                res.status(404).json({ message: 'User id does not exist' })
-            }
-        })
-        .catch(error => {
-            console.log('error on PUT to /users/:id', error)
-            res
-                .end()
-                .status(500)
-                .json({ error: 'The user info couldnt be changed' })
-        });
+    if (!dbUserInfo.name || !dbUserInfo.bio) {
+        res
+            .status(400)
+            .json({ errorMessage: 'Please give us the user requested info' })
+    } else {
+        db.update(id, dbUserInfo)
+            .then(user => {
+                if (user) {
+                    res.status(200).json({ message: `Updated with ${dbUserInfo.name} ${dbUserInfo.bio}` })
+                } else {
+                    res.status(404).json({ message: 'User with that ID doesnt exist' })
+                }
+            })
+            .catch(() => {
+                res
+                    .status(500)
+                    .json({ error: 'The user information could not be modified.' })
+            })
+    }
 })
