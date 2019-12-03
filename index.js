@@ -102,27 +102,51 @@ server.delete('/users/:id', (req, res) => {
 // PUT REQUESTS BELOW
 // 1.
 
-server.put('users/:id', (req, res) => {
-    const id = req.params.id;
-    const dbUserInfo = req.body;
+// server.put('users/:id', (req, res) => {
+//     const id = req.params.id;
+//     const dbUserInfo = req.body;
 
-    if (!dbUserInfo.name || !dbUserInfo.bio) {
+//     if (!dbUserInfo.name || !dbUserInfo.bio) {
+//         res
+//             .status(400)
+//             .json({ errorMessage: 'Please give us the user requested info' })
+//     } else {
+//         db.update(id, dbUserInfo)
+//             .then(user => {
+//                 if (user) {
+//                     res.status(200).json({ message: `Updated with ${dbUserInfo.name} ${dbUserInfo.bio}` })
+//                 } else {
+//                     res.status(404).json({ message: 'User with that ID doesnt exist' })
+//                 }
+//             })
+//             .catch(() => {
+//                 res
+//                     .status(500)
+//                     .json({ error: 'The user information could not be modified.' })
+//             })
+//     }
+// })
+
+server.put('/users/:id', (req, res) => {
+    const { name, bio } = req.body;
+
+    if (!name || !bio) {
         res
             .status(400)
-            .json({ errorMessage: 'Please give us the user requested info' })
+            .json({ errorMessage: "Please provide name and bio for the user." })
     } else {
-        db.update(id, dbUserInfo)
+        db.update(req.params.id, req.body)
             .then(user => {
                 if (user) {
-                    res.status(200).json({ message: `Updated with ${dbUserInfo.name} ${dbUserInfo.bio}` })
+                    res.status(200).json( req.body );
                 } else {
-                    res.status(404).json({ message: 'User with that ID doesnt exist' })
+                    res.status(404).json({ message: "The user with the specified ID does not exist." })
                 }
             })
-            .catch(() => {
+            .catch(error => {
                 res
                     .status(500)
-                    .json({ error: 'The user information could not be modified.' })
-            })
+                    .json({ error: "The user information could not be modified." })
+            });
     }
 })
